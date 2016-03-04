@@ -1477,28 +1477,15 @@ function snake_case(name, separator) {
 }
 
 function bindJQuery() {
-  // bind to jQuery if present;
+  /* NOTE: In order to avoid any future conflicts with older versions of jQuery on a client's page
+   *       we are making the conscious decision to force angular to always use JQLite.
+   *       The jquery detection in angular 1.2.28 by default is not adequate because it does not take
+   *       into consideration other jQuery plugins which might introduce the .on property to the jQuery object
+   *       while the underlying jQuery version is old. (I.E. our angular app was trying to use jQuery 1.3)
+   */
   jQuery = window.jQuery;
-  // Use jQuery if it exists with proper functionality, otherwise default to us.
-  // Angular 1.2+ requires jQuery 1.7.1+ for on()/off() support.
-  if (jQuery && jQuery.fn.on) {
-    jqLite = jQuery;
-    extend(jQuery.fn, {
-      scope: JQLitePrototype.scope,
-      isolateScope: JQLitePrototype.isolateScope,
-      controller: JQLitePrototype.controller,
-      injector: JQLitePrototype.injector,
-      inheritedData: JQLitePrototype.inheritedData
-    });
-    // Method signature:
-    //     jqLitePatchJQueryRemove(name, dispatchThis, filterElems, getterIfNoArguments)
-    jqLitePatchJQueryRemove('remove', true, true, false);
-    jqLitePatchJQueryRemove('empty', false, false, false);
-    jqLitePatchJQueryRemove('html', false, false, true);
-  } else {
-    jqLite = JQLite;
-  }
-  angular.element = jqLite;
+  jqLite = JQLite;
+  angular.element = JQLite;
 }
 
 /**
